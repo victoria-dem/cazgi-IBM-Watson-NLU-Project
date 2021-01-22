@@ -10,7 +10,7 @@ class App extends React.Component {
           sentimentOutput:[],
           sentiment:true
         }
-  
+
   renderTextArea = ()=>{
     document.getElementById("textinput").value = "";
     if(this.state.mode === "url") {
@@ -19,7 +19,7 @@ class App extends React.Component {
       sentimentOutput:[],
       sentiment:true
     })
-    } 
+    }
   }
 
   renderTextBox = ()=>{
@@ -47,15 +47,17 @@ class App extends React.Component {
     ret.then((response)=>{
 
       //Include code here to check the sentiment and fomrat the data accordingly
+      const sentimentLabel = response.data.result.sentiment.document.label;
+      const renderResult = Object.values(response.data.result.sentiment.document).join(' ');
 
-      this.setState({sentimentOutput:response.data});
+      this.setState({sentimentOutput:renderResult});
       let output = response.data;
-      if(response.data === "positive") {
-        output = <div style={{color:"green",fontSize:20}}>{response.data}</div>
-      } else if (response.data === "negative"){
-        output = <div style={{color:"red",fontSize:20}}>{response.data}</div>
+      if(sentimentLabel === "positive") {
+        output = <div style={{color:"green",fontSize:20}}>{renderResult}</div>
+      } else if (sentimentLabel === "negative"){
+        output = <div style={{color:"red",fontSize:20}}>{renderResult}</div>
       } else {
-        output = <div style={{color:"orange",fontSize:20}}>{response.data}</div>
+        output = <div style={{color:"yellow",fontSize:20}}>{renderResult}</div>
       }
       this.setState({sentimentOutput:output});
     });
@@ -73,13 +75,13 @@ class App extends React.Component {
     ret = axios.get(url);
 
     ret.then((response)=>{
-      this.setState({sentimentOutput:<EmotionTable emotions={response.data}/>});
+      this.setState({sentimentOutput:<EmotionTable emotions={response.data.result.emotion.document}/>});
   });
   }
-  
+
 
   render() {
-    return (  
+    return (
       <div className="App">
       <button className="btn btn-info" onClick={this.renderTextArea}>Text</button>
         <button className="btn btn-dark"  onClick={this.renderTextBox}>URL</button>

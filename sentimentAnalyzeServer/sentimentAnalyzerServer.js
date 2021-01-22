@@ -3,6 +3,16 @@ const app = new express();
 const dotenv = require('dotenv');
 dotenv.config();
 
+
+function getAnalyzeParam (sourceType, analyzeType, data) {
+    let analyzeParam = {};
+    analyzeParam[sourceType] = data;
+    analyzeParam.features = {}
+    analyzeParam.features[analyzeType] = {};
+    return analyzeParam;
+}
+
+
 function getNLUInstance() {
     let api_key = process.env.API_KEY;
     let api_url = process.env.API_URL;
@@ -29,20 +39,44 @@ app.get("/",(req,res)=>{
   });
 
 app.get("/url/emotion", (req,res) => {
-
-    return res.send({"happy":"90","sad":"10"});
+    getNLUInstance().analyze(getAnalyzeParam('url','emotion', req.query.url))
+        .then(analysisResults => {
+            return res.send(JSON.stringify(analysisResults, null, 2));
+        })
+        .catch(err => {
+            return res.send(err.toString());
+        });
 });
 
 app.get("/url/sentiment", (req,res) => {
-    return res.send("url sentiment for "+req.query.url);
+    getNLUInstance().analyze(getAnalyzeParam('url','sentiment', req.query.url))
+        .then(analysisResults => {
+            return res.send(JSON.stringify(analysisResults, null, 2));
+        })
+        .catch(err => {
+            return res.send(err.toString());
+        });
 });
 
 app.get("/text/emotion", (req,res) => {
-    return res.send({"happy":"10","sad":"90"});
+    getNLUInstance().analyze(getAnalyzeParam('text','emotion', req.query.text))
+        .then(analysisResults => {
+          return res.send(JSON.stringify(analysisResults, null, 2));
+        })
+        .catch(err => {
+          return res.send(err.toString());
+        });
 });
 
 app.get("/text/sentiment", (req,res) => {
-    return res.send("text sentiment for "+req.query.text);
+    getNLUInstance().analyze(getAnalyzeParam('text','sentiment', req.query.text))
+        .then(analysisResults => {
+            console.log(typeof JSON.stringify(analysisResults));
+            return res.send(JSON.stringify(analysisResults, null, 2));
+        })
+        .catch(err => {
+            return res.send(err.toString());
+        });
 });
 
 let server = app.listen(8080, () => {
